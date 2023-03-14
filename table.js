@@ -42,11 +42,11 @@ export const generateObjects = (n) => {
     const object = {
       id: i,
       name: `Deal ${i}`,
+      amount: Math.random() * 100,
       address: `${Math.floor(Math.random() * 1000) + 1} ${
         streets[Math.floor(Math.random() * streets.length)]
       } ${streetEndings[Math.floor(Math.random() * streetEndings.length)]}`,
       contactName: generateName(),
-      amount: Math.random() * 100,
       email: `contact${i}@example.com`,
     };
     objects.push(object);

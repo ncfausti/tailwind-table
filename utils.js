@@ -22,3 +22,13 @@ export const assertEqual = (actual, expected) => {
     console.error(`Assertion failed: expected ${expected}, but got ${actual}`);
   }
 };
+
+export const filterTable = (table, searchTerm) => {
+  return table.filter(
+    (row) =>
+      row.name.toLowerCase().indexOf(searchTerm) > -1 ||
+      row.email.toLowerCase().indexOf(searchTerm) > -1 ||
+      row.contactName.toLowerCase().indexOf(searchTerm) > -1 ||
+      row.address.toLowerCase().indexOf(searchTerm) > -1
+  );
+};

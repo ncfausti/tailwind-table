@@ -3,7 +3,7 @@
 //
 // - Clicking on a Deal takes you to that Deal's details page
 //
-// - Ascending/Descending sorting for the first 3 columns
+// - DONE Ascending/Descending sorting for the first 3 columns
 //
 // - Adjustable # of entries per page
 //
@@ -68,7 +68,8 @@ export const buildConfig = (data, config) => {
 // (data: array, containerId: string, options: obj})
 const createTable = (data, containerId, config) => {
   const _el = document.getElementById(containerId);
-  const _table = data;
+  const readOnlyData = data;
+  let _table = data;
 
   // if no config object is passed in default to:
   // sortable = true and baseFmt for all data cells
@@ -146,9 +147,9 @@ const createTable = (data, containerId, config) => {
     const key = e.target.dataset.value;
 
     if (_currentSort === true) {
-      const sorted = _table.sort((a, b) => sortAsc(a[key], b[key]));
+      _table.sort((a, b) => sortAsc(a[key], b[key]));
     } else {
-      const sorted = _table.sort((a, b) => sortDesc(a[key], b[key]));
+      _table.sort((a, b) => sortDesc(a[key], b[key]));
     }
 
     update();
@@ -156,9 +157,25 @@ const createTable = (data, containerId, config) => {
     return;
   };
 
+  const _filterTable = (e) => {
+    const searchTerm = e.target.value;
+
+    _table = readOnlyData.filter(
+      (row) =>
+        row.name.toLowerCase().indexOf(searchTerm) > -1 ||
+        row.email.toLowerCase().indexOf(searchTerm) > -1 ||
+        row.contactName.toLowerCase().indexOf(searchTerm) > -1 ||
+        row.address.toLowerCase().indexOf(searchTerm) > -1
+    );
+
+    update();
+    return;
+  };
+
   return {
     // Table API
-    rows: _table, //
+    rows: _table,
+    search: _filterTable,
     sort: _sortTable, // sort based on data-value of buttons
     container: _el, // return the element containing the table
   };
@@ -183,6 +200,12 @@ btn.onclick = dataTable.sort;
 
 const btnName = document.getElementById("sort-name");
 btnName.onclick = dataTable.sort;
+
+const btnId = document.getElementById("sort-id");
+btnId.onclick = dataTable.sort;
+
+const searchBox = document.getElementById("search");
+searchBox.onkeyup = dataTable.search;
 
 // TESTS
 const dataTest = [
