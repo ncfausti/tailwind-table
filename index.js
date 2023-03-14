@@ -18,13 +18,6 @@ const cache = {
   // key:val
 };
 
-const options = {
-  sortable: true,
-
-  // Cell overrides must use column header value as key
-  cellOverrides: {},
-};
-
 // Allow overriding basic display for any cell
 const CustomCell = (val, row, fmtCallback) => {
   return fmtCallback(val, row);
@@ -124,18 +117,20 @@ const createTable = (data, containerId, config) => {
     headerRow.appendChild(th);
   });
 
-  // append the header
-  thead.appendChild(headerRow);
-
-  // create initial table rows from data list passed in
   const update = () => {
+    const table = document.createElement("table");
+    const thead = document.createElement("thead");
+    const tbody = document.createElement("tbody");
+
+    thead.appendChild(headerRow);
+
     _table.forEach((rowData) => {
       const tr = document.createElement("tr");
       headers.forEach((header) => {
         // get the format function for this column
         const fn = _config.fmtFn[header];
 
-        // call the format function with this data
+        // call the format function and append to table
         const td = document.createElement("td");
         const text = fn(rowData[header]);
         td.innerHTML = text;
@@ -143,28 +138,34 @@ const createTable = (data, containerId, config) => {
       });
       tbody.appendChild(tr);
     });
+    table.appendChild(thead);
+    table.appendChild(tbody);
+
+    _el.innerHTML = table.outerHTML;
+    return tbody;
   };
 
   update();
 
-  table.appendChild(thead);
+  //   table.appendChild(thead);
   table.appendChild(tbody);
 
-  _el.innerHTML = table.outerHTML;
+  _el.appendChild(table);
 
   let _currentSort = false;
 
   // sort internal data list then update the html
   const _sortTable = (e) => {
     const key = e.target.dataset.value;
+    // console.log(key);
     if (_currentSort === true) {
       const sorted = _table.sort((a, b) => a[key] - b[key]);
-      update();
-      return sorted;
+    } else {
+      const sorted = _table.sort((a, b) => b[key] - a[key]);
     }
-    const sorted = _table.sort((a, b) => b[key] - a[key]);
     update();
-    return sorted;
+    _currentSort = !_currentSort;
+    return;
   };
 
   return {
@@ -182,7 +183,7 @@ const tableOptions = {
   },
 };
 
-const dataTable = createTable(data, "Table");
+const dataTable = createTable(data, "Table", tableOptions);
 
 const btn = document.getElementById("sort");
 btn.onclick = dataTable.sort;
