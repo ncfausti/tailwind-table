@@ -26,9 +26,7 @@ const streetEndings = ["St", "Ave", "Rd", "Way"];
 const generateUniqueNameFunction = (firstNames, lastNames) => {
   return function () {
     const randomFirstNameIndex = Math.floor(Math.random() * firstNames.length);
-
     const randomLastNameIndex = Math.floor(Math.random() * lastNames.length);
-
     const firstName = firstNames[randomFirstNameIndex];
     const lastName = lastNames[randomLastNameIndex];
 
@@ -45,7 +43,7 @@ export const generateObjects = (n) => {
       id: i,
       name: generateName(),
       address: `${Math.floor(Math.random() * 1000) + 1} ${
-        streets[Math.floor(Math.random() * 10)]
+        streets[Math.floor(Math.random() * streets.length)]
       } ${streetEndings[Math.floor(Math.random() * streetEndings.length)]}`,
       contactName: `Contact ${i}`,
       amount: Math.random() * 100,

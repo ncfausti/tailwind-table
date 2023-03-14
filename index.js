@@ -11,7 +11,7 @@
 //
 // - Search
 
-import { data, generateObjects } from "./table.js";
+import { generateObjects } from "./table.js";
 import { assertEqual } from "./test.js";
 // Cache sorted values here
 const cache = {
@@ -32,34 +32,47 @@ const fmtBase = (val) => {
   return val;
 };
 
-// ex. formatCallback, must be same as
 const dealNameCol = (val, row) => {
   return `
-    <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-0">
-        <div class="flex items-center">
-        <div class="h-10 w-10 flex-shrink-0">
-            <img
-            class="h-10 w-10 rounded-full"
-            src="https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-            alt=""
-            />
-        </div>
-        <div class="ml-4">
-            <div class="font-medium text-gray-900">
-            ${val}
+    <td>
+        <div class="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-0">
+            <div class="flex items-center">
+                <div class="h-10 w-10 flex-shrink-0">
+                    <img
+                    class="h-10 w-10 rounded-full"
+                    src="https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                    alt=""
+                    />
+                </div>
+                <div class="ml-4">
+                    <div class="font-medium text-gray-900">
+                    ${val}
+                    </div>
+                    <div class="text-gray-500">
+                    ${row.email}
+                    </div>
+                </div>
             </div>
-            <div class="text-gray-500">
-            ${row.email}
-            </div>
-        </div>
         </div>
     </td>`;
 };
 
 const amountCol = (val, row) => {
-  return `<td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-0">${USD(
-    val
-  )}</td>`;
+  return `<td>
+  <div class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+    <span
+      class="inline-flex rounded-full bg-green-100 px-2 text-xs font-semibold leading-5 text-green-800"
+      >${USD(val)}</span>
+      </div>
+  </td>`;
+};
+
+const emailCol = (val, row) => {
+  return `<td>
+            <span class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+            ${val}
+            </span>
+        </td>`;
 };
 
 export const buildConfig = (data, config) => {
@@ -138,9 +151,9 @@ const createTable = (data, containerId, config) => {
     _table.forEach((rowData) => {
       const tr = document.createElement("tr");
       headers.forEach((header) => {
+        debugger;
         // get the format function for this column
         const fn = _config.fmtFn[header];
-
         // call the format function and append to table
         const td = document.createElement("td");
         const text = fn(rowData[header], rowData);
@@ -167,13 +180,28 @@ const createTable = (data, containerId, config) => {
 
   // sort internal data list then update the html
   const _sortTable = (e) => {
+    const sortAsc = (a, b) => {
+      if (typeof a === "string" && typeof b === "string") {
+        return a.localeCompare(b);
+      } else {
+        return a - b;
+      }
+    };
+    const sortDesc = (a, b) => {
+      if (typeof a === "string" && typeof b === "string") {
+        return b.localeCompare(a);
+      } else {
+        return b - a;
+      }
+    };
     const key = e.target.dataset.value;
-    // console.log(key);
+
     if (_currentSort === true) {
-      const sorted = _table.sort((a, b) => a[key] - b[key]);
+      const sorted = _table.sort((a, b) => sortAsc(a[key], b[key]));
     } else {
-      const sorted = _table.sort((a, b) => b[key] - a[key]);
+      const sorted = _table.sort((a, b) => sortDesc(a[key], b[key]));
     }
+
     update();
     _currentSort = !_currentSort;
     return;
@@ -190,19 +218,22 @@ const createTable = (data, containerId, config) => {
 const tableOptions = {
   sortable: false,
   cellOverrides: {
-    // contactName: (v) => `<div class="bold">${v}</div>`,
     contactName: (v, row) => dealNameCol(v, row),
     amount: (v, row) => amountCol(v, row),
+    email: (v, row) => emailCol(v, row),
   },
 };
 
 // const tableData = data;
-const tableData = generateObjects(1000);
+const tableData = generateObjects(100);
 
 const dataTable = createTable(tableData, "Table", tableOptions);
 
 const btn = document.getElementById("sort");
 btn.onclick = dataTable.sort;
+
+const btnName = document.getElementById("sort-name");
+btnName.onclick = dataTable.sort;
 
 // TESTS
 const dataTest = [
