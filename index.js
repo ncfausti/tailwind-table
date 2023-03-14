@@ -11,12 +11,17 @@
 //
 // - Search
 
-import { data } from "./table.js";
+import { data, generateObjects } from "./table.js";
 import { assertEqual } from "./test.js";
 // Cache sorted values here
 const cache = {
   // key:val
 };
+const USD = (amount) =>
+  amount.toLocaleString("en-US", {
+    style: "currency",
+    currency: "USD",
+  });
 
 // Allow overriding basic display for any cell
 const CustomCell = (val, row, fmtCallback) => {
@@ -29,7 +34,7 @@ const fmtBase = (val) => {
 
 // ex. formatCallback, must be same as
 const dealNameCol = (val, row) => {
-  return ```
+  return `
     <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-0">
         <div class="flex items-center">
         <div class="h-10 w-10 flex-shrink-0">
@@ -48,7 +53,13 @@ const dealNameCol = (val, row) => {
             </div>
         </div>
         </div>
-    </td>```;
+    </td>`;
+};
+
+const amountCol = (val, row) => {
+  return `<td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-0">${USD(
+    val
+  )}</td>`;
 };
 
 export const buildConfig = (data, config) => {
@@ -132,7 +143,7 @@ const createTable = (data, containerId, config) => {
 
         // call the format function and append to table
         const td = document.createElement("td");
-        const text = fn(rowData[header]);
+        const text = fn(rowData[header], rowData);
         td.innerHTML = text;
         tr.appendChild(td);
       });
@@ -179,11 +190,16 @@ const createTable = (data, containerId, config) => {
 const tableOptions = {
   sortable: false,
   cellOverrides: {
-    contactName: (v) => `<div class="bold">${v}</div>`,
+    // contactName: (v) => `<div class="bold">${v}</div>`,
+    contactName: (v, row) => dealNameCol(v, row),
+    amount: (v, row) => amountCol(v, row),
   },
 };
 
-const dataTable = createTable(data, "Table", tableOptions);
+// const tableData = data;
+const tableData = generateObjects(1000);
+
+const dataTable = createTable(tableData, "Table", tableOptions);
 
 const btn = document.getElementById("sort");
 btn.onclick = dataTable.sort;
