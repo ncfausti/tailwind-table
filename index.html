@@ -14,12 +14,6 @@
       <div class="sm:flex sm:items-center">
         <div class="sm:flex-auto">
           <h1 class="text-base font-semibold leading-6 text-gray-900">Users</h1>
-          <!-- <p class="mt-2 text-sm text-gray-700">
-            A list of all the users in your account including their name, title,
-            email and role.
-          </p> -->
-          <!-- A table, where each row is a Deal with 
-            attributes: Id, Name, Amount ($), Address, Contact Name -->
         </div>
         <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
           <button
@@ -47,9 +41,28 @@
                   </th>
                   <th
                     scope="col"
-                    class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0"
+                    class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                   >
-                    Deal Name
+                    <a href="#" class="group inline-flex">
+                      Deal Name
+                      <!-- Active: "bg-gray-200 text-gray-900 group-hover:bg-gray-300", Not Active: "invisible text-gray-400 group-hover:visible group-focus:visible" -->
+                      <span
+                        class="ml-2 flex-none rounded bg-gray-100 text-gray-900 group-hover:bg-gray-200"
+                      >
+                        <svg
+                          class="h-5 w-5"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                          aria-hidden="true"
+                        >
+                          <path
+                            fill-rule="evenodd"
+                            d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
+                            clip-rule="evenodd"
+                          />
+                        </svg>
+                      </span>
+                    </a>
                   </th>
                   <th
                     scope="col"
@@ -119,7 +132,6 @@
                     >
                   </td>
                 </tr>
-                <!-- More people... -->
               </tbody>
             </table>
           </div>
