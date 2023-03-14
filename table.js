@@ -1,5 +1,5 @@
 // Id, Name, Amount ($), Address, Contact Name
-const firstNames = ["Alan", "Ada", "Bob", "Gace", "Jon", "Steve", "Frank"];
+const firstNames = ["Alan", "Ada", "Bob", "Grace", "Jon", "Steve", "Frank"];
 
 const lastNames = [
   "Jobs",
@@ -41,11 +41,11 @@ export const generateObjects = (n) => {
   for (let i = 0; i < n; i++) {
     const object = {
       id: i,
-      name: generateName(),
+      name: `Deal ${i}`,
       address: `${Math.floor(Math.random() * 1000) + 1} ${
         streets[Math.floor(Math.random() * streets.length)]
       } ${streetEndings[Math.floor(Math.random() * streetEndings.length)]}`,
-      contactName: `Contact ${i}`,
+      contactName: generateName(),
       amount: Math.random() * 100,
       email: `contact${i}@example.com`,
     };

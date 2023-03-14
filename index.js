@@ -12,7 +12,9 @@
 // - Search
 
 import { generateObjects } from "./table.js";
+import { convertCamelCaseToTitleCase } from "./utils.js";
 import { assertEqual } from "./test.js";
+
 // Cache sorted values here
 const cache = {
   // key:val
@@ -134,7 +136,7 @@ const createTable = (data, containerId, config) => {
   const headers = Object.keys(data[0]);
 
   // create columns for header row
-  headers.forEach((header) => {
+  convertCamelCaseToTitleCase(headers).forEach((header) => {
     const th = document.createElement("th");
     const text = document.createTextNode(header);
     th.appendChild(text);
@@ -151,7 +153,6 @@ const createTable = (data, containerId, config) => {
     _table.forEach((rowData) => {
       const tr = document.createElement("tr");
       headers.forEach((header) => {
-        debugger;
         // get the format function for this column
         const fn = _config.fmtFn[header];
         // call the format function and append to table
@@ -280,3 +281,8 @@ assertEqual(
 );
 assertEqual(confB.fmtFn.amount(objTest.amount), 30.45);
 assertEqual(confB.fmtFn.email(objTest.email), "john@example.com");
+
+const camelCaseStrings = ["firstName", "lastName", "addressLine1", "zipCode"];
+const titleCaseStrings = convertCamelCaseToTitleCase(camelCaseStrings);
+const correct = ["First Name", "Last Name", "Address Line 1", "Zip Code"];
+titleCaseStrings.forEach((s, i) => assertEqual(s, correct[i]));
