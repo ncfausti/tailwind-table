@@ -73,7 +73,7 @@ export const buildConfig = (data, config) => {
     // default to sortable: true, fmtBase(val)
     return {
       sortable: true,
-      fmtFn: formatFunctions,
+      fmtFn: allBaseFormatFunctions,
     };
   } else {
     let conf = {};
@@ -175,12 +175,14 @@ const createTable = (data, containerId, config) => {
   };
 };
 
-const dataTable = createTable(data, "Table", {
+const tableOptions = {
   sortable: false,
   cellOverrides: {
     contactName: (v) => `<div class="bold">${v}</div>`,
   },
-});
+};
+
+const dataTable = createTable(data, "Table");
 
 const btn = document.getElementById("sort");
 btn.onclick = dataTable.sort;
@@ -198,13 +200,6 @@ const dataTest = [
 ];
 
 const objTest = dataTest[0];
-
-// Example function to test
-function add(a, b) {
-  return a + b;
-}
-
-// Tests
 
 // no override functions specified
 const optsA = { sortable: true };
