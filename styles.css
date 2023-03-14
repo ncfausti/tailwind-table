@@ -2,3 +2,7 @@ body {
     /* background-color: rgb(80, 0, 162) */
     background-color: #fdfdfd;
 }
+
+.bold {
+    font-weight: 600;
+}

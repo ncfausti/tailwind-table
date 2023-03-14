@@ -12,20 +12,26 @@
 // - Search
 
 import { data } from "./table.js";
-
+import { assertEqual } from "./test.js";
 // Cache sorted values here
 const cache = {
   // key:val
 };
 
-const options = { 
-    sortable: true, 
-    cellOverrides: {}
+const options = {
+  sortable: true,
+
+  // Cell overrides must use column header value as key
+  cellOverrides: {},
 };
 
 // Allow overriding basic display for any cell
 const CustomCell = (val, row, fmtCallback) => {
   return fmtCallback(val, row);
+};
+
+const fmtBase = (val) => {
+  return val;
 };
 
 // ex. formatCallback, must be same as
@@ -52,12 +58,54 @@ const dealNameCol = (val, row) => {
     </td>```;
 };
 
+export const buildConfig = (data, config) => {
+  if (!data) throw new Error("Must specify a datasource");
+  if (data.length === 0)
+    throw new Error("Datasource must have at least one row");
 
+  // set default formatFunctions
+  const allBaseFormatFunctions = Object.keys(data[0]).reduce((obj, key) => {
+    obj[key] = fmtBase;
+    return obj;
+  }, {});
+
+  if (!config) {
+    // default to sortable: true, fmtBase(val)
+    return {
+      sortable: true,
+      fmtFn: formatFunctions,
+    };
+  } else {
+    let conf = {};
+    // check for sortable
+    if (config.sortable === undefined) {
+      conf.sortable = true;
+    } else {
+      conf.sortable = config.sortable;
+    }
+    // check for format functions
+    if (config.cellOverrides === undefined) {
+      conf.fmtFn = allBaseFormatFunctions;
+    } else {
+      // take the functions in config.cellOverrides that are specified and apply them
+      conf.fmtFn = allBaseFormatFunctions;
+      Object.keys(config.cellOverrides).forEach(
+        (key) => (conf.fmtFn[key] = config.cellOverrides[key])
+      );
+    }
+
+    return conf;
+  }
+};
 
 // (data: array, containerId: string, options: obj})
 const createTable = (data, containerId, config) => {
   const _el = document.getElementById(containerId);
   const _table = data;
+
+  // if no config object is passed in default to:
+  // sortable = true and baseFmt for all data cells
+  const _config = buildConfig(data, config);
 
   // setup basic table elements needed
   const table = document.createElement("table");
@@ -84,21 +132,21 @@ const createTable = (data, containerId, config) => {
     _table.forEach((rowData) => {
       const tr = document.createElement("tr");
       headers.forEach((header) => {
+        // get the format function for this column
+        const fn = _config.fmtFn[header];
 
-        // if there is a cell override for this column, use that
-
-        // else
+        // call the format function with this data
         const td = document.createElement("td");
-        const text = document.createTextNode(rowData[header]);
-
-
-        td.appendChild(text);
+        const text = fn(rowData[header]);
+        td.innerHTML = text;
         tr.appendChild(td);
       });
       tbody.appendChild(tr);
     });
   };
+
   update();
+
   table.appendChild(thead);
   table.appendChild(tbody);
 
@@ -127,7 +175,65 @@ const createTable = (data, containerId, config) => {
   };
 };
 
-const dataTable = createTable(data, "Table", options);
+const dataTable = createTable(data, "Table", {
+  sortable: false,
+  cellOverrides: {
+    contactName: (v) => `<div class="bold">${v}</div>`,
+  },
+});
 
 const btn = document.getElementById("sort");
 btn.onclick = dataTable.sort;
+
+// TESTS
+const dataTest = [
+  {
+    id: 0,
+    name: "xyz deal",
+    address: "123 main street",
+    contactName: "John Doe",
+    amount: 30.45,
+    email: "john@example.com",
+  },
+];
+
+const objTest = dataTest[0];
+
+// Example function to test
+function add(a, b) {
+  return a + b;
+}
+
+// Tests
+
+// no override functions specified
+const optsA = { sortable: true };
+const confA = buildConfig(dataTest, optsA);
+
+assertEqual(confA.sortable, true);
+assertEqual(confA.fmtFn.id(objTest.id), objTest.id);
+assertEqual(confA.fmtFn.name(objTest.name), objTest.name);
+assertEqual(confA.fmtFn.address(objTest.address), objTest.address);
+assertEqual(confA.fmtFn.contactName(objTest.contactName), objTest.contactName);
+assertEqual(confA.fmtFn.amount(objTest.amount), objTest.amount);
+assertEqual(confA.fmtFn.email(objTest.email), objTest.email);
+
+// with override function for contactName field
+const optsB = {
+  sortable: false,
+  cellOverrides: {
+    contactName: (v) => `<div class="bold">${v}</div>`,
+  },
+};
+
+const confB = buildConfig(dataTest, optsB);
+assertEqual(confB.sortable, false);
+assertEqual(confB.fmtFn.id(objTest.id), 0);
+assertEqual(confB.fmtFn.name(objTest.name), "xyz deal");
+assertEqual(confB.fmtFn.address(objTest.address), "123 main street");
+assertEqual(
+  confB.fmtFn.contactName(objTest.contactName),
+  `<div class="bold">John Doe</div>`
+);
+assertEqual(confB.fmtFn.amount(objTest.amount), 30.45);
+assertEqual(confB.fmtFn.email(objTest.email), "john@example.com");
