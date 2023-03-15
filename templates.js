@@ -1,4 +1,4 @@
-const USD = (amount) => {
+export const USD = (amount) => {
   return amount.toLocaleString("en-US", {
     style: "currency",
     currency: "USD",
@@ -31,19 +31,30 @@ export const dealNameCol = (val, row) => {
 };
 
 export const amountCol = (val, row) => {
-  return `<td>
-    <div class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-      <span
-        class="inline-flex rounded-full bg-green-100 px-2 text-xs font-semibold leading-5 text-green-800"
-        >${USD(val)}</span>
+  return `
+    <td>
+        <div class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+        <span class="inline-flex rounded-full bg-green-100 px-2 text-xs 
+            font-semibold leading-5 text-green-800">
+            ${USD(val)}
+        </span>
         </div>
     </td>`;
 };
 
-export const emailCol = (val, row) => {
+export const grayCol = (val, row) => {
   return `<td>
               <span class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
               ${val}
               </span>
           </td>`;
+};
+
+export const thCol = (val, row) => {
+  return `<th
+    scope="col"
+    class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0"
+  >
+    ${val}
+  </th>`;
 };

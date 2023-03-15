@@ -9,17 +9,13 @@
 //
 // - Pagination
 //
-// - Search
+// - DONE Search
 
 import { generateObjects } from "./table.js";
+import { data } from "./data.js";
 import { convertCamelCaseToTitleCase } from "./utils.js";
-import { amountCol, dealNameCol, emailCol } from "./templates.js";
+import { amountCol, dealNameCol, grayCol } from "./templates.js";
 import { assertEqual } from "./test.js";
-
-// Cache sorted values here
-const cache = {
-  // key:val
-};
 
 const fmtBase = (val) => {
   return val;
@@ -101,6 +97,9 @@ const createTable = (data, containerId, config) => {
 
     _table.forEach((rowData) => {
       const tr = document.createElement("tr");
+      tr.setAttribute("data-id", rowData["id"]);
+      tr.setAttribute("onclick", `view('/deal?id=${rowData["id"]}')`);
+      tr.className = "text-xl";
       headers.forEach((header) => {
         // get the format function for this column
         const fn = _config.fmtFn[header];
@@ -160,6 +159,8 @@ const createTable = (data, containerId, config) => {
   const _filterTable = (e) => {
     // need to take sorted into consideration to keep
     // results sorted when searching
+    // and limit per page
+    // and pagination
     const searchTerm = e.target.value.toLowerCase();
 
     _table = readOnlyData.filter(
@@ -186,14 +187,19 @@ const createTable = (data, containerId, config) => {
 const tableOptions = {
   sortable: false,
   cellOverrides: {
+    id: (v, row) => grayCol(v, row),
+    name: (v, row) => grayCol(v, row),
     contactName: (v, row) => dealNameCol(v, row),
     amount: (v, row) => amountCol(v, row),
-    email: (v, row) => emailCol(v, row),
+    email: (v, row) => grayCol(v, row),
+    address: (v, row) => grayCol(v, row),
   },
 };
 
-// const tableData = data;
-const tableData = generateObjects(100);
+const tableData = data;
+// const tableData = generateObjects(100);
+
+console.log(tableData);
 
 const dataTable = createTable(tableData, "Table", tableOptions);
 
