@@ -158,7 +158,9 @@ const createTable = (data, containerId, config) => {
   };
 
   const _filterTable = (e) => {
-    const searchTerm = e.target.value;
+    // need to take sorted into consideration to keep
+    // results sorted when searching
+    const searchTerm = e.target.value.toLowerCase();
 
     _table = readOnlyData.filter(
       (row) =>
@@ -175,7 +177,7 @@ const createTable = (data, containerId, config) => {
   return {
     // Table API
     rows: _table,
-    search: _filterTable,
+    search: _filterTable, //
     sort: _sortTable, // sort based on data-value of buttons
     container: _el, // return the element containing the table
   };
