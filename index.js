@@ -165,19 +165,42 @@ export const createTable = (data, containerId, config) => {
   // Define the page size
   const pageSize = 10;
 
+  // semi-global flag to be used in paginate
+  let searchTerm;
+  let _filterTerm = searchTerm === undefined ? "" : searchTerm;
+
   // Define the current page
   let currentPage = 1;
 
-  // filter and sort need to be mainted on pagination
-
   // Define the function to handle pagination
   const paginate = () => {
+    // Check if a filter shoould be applied FIRST
+    // if (_filterTerm) {
+    //   _data = readOnlyData.filter(
+    //     (row) =>
+    //       row.name.toLowerCase().indexOf(_filterTerm) > -1 ||
+    //       row.email.toLowerCase().indexOf(_filterTerm) > -1 ||
+    //       row.contactName.toLowerCase().indexOf(_filterTerm) > -1 ||
+    //       row.address.toLowerCase().indexOf(_filterTerm) > -1
+    //   );
+    // }
+
     // Calculate the start index and end index of the current page
     const startIndex = (currentPage - 1) * pageSize;
     const endIndex = startIndex + pageSize;
 
+    console.log("filter: ", _filterTerm);
+
     // Get the data for the current page
-    _data = readOnlyData.slice(startIndex, endIndex);
+    _data = readOnlyData
+      .filter(
+        (row) =>
+          row.name.toLowerCase().indexOf(_filterTerm) > -1 ||
+          row.email.toLowerCase().indexOf(_filterTerm) > -1 ||
+          row.contactName.toLowerCase().indexOf(_filterTerm) > -1 ||
+          row.address.toLowerCase().indexOf(_filterTerm) > -1
+      )
+      .slice(startIndex, endIndex);
 
     // Display the data in the table
     // displayData(data);
@@ -219,8 +242,8 @@ export const createTable = (data, containerId, config) => {
 
   const _filterTable = (e) => {
     const searchTerm = e.target.value.toLowerCase();
+    _filterTerm = searchTerm;
 
-    // filter the results using the master list
     _data = readOnlyData.filter(
       (row) =>
         row.name.toLowerCase().indexOf(searchTerm) > -1 ||
