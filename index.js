@@ -175,15 +175,13 @@ export const createTable = (data, containerId, config) => {
   // Define the function to handle pagination
   const paginate = () => {
     // Check if a filter shoould be applied FIRST
-    // if (_filterTerm) {
-    //   _data = readOnlyData.filter(
-    //     (row) =>
-    //       row.name.toLowerCase().indexOf(_filterTerm) > -1 ||
-    //       row.email.toLowerCase().indexOf(_filterTerm) > -1 ||
-    //       row.contactName.toLowerCase().indexOf(_filterTerm) > -1 ||
-    //       row.address.toLowerCase().indexOf(_filterTerm) > -1
-    //   );
-    // }
+    const filteredData = readOnlyData.filter(
+      (row) =>
+        row.name.toLowerCase().indexOf(_filterTerm) > -1 ||
+        row.email.toLowerCase().indexOf(_filterTerm) > -1 ||
+        row.contactName.toLowerCase().indexOf(_filterTerm) > -1 ||
+        row.address.toLowerCase().indexOf(_filterTerm) > -1
+    );
 
     // Calculate the start index and end index of the current page
     const startIndex = (currentPage - 1) * pageSize;
@@ -192,22 +190,14 @@ export const createTable = (data, containerId, config) => {
     console.log("filter: ", _filterTerm);
 
     // Get the data for the current page
-    _data = readOnlyData
-      .filter(
-        (row) =>
-          row.name.toLowerCase().indexOf(_filterTerm) > -1 ||
-          row.email.toLowerCase().indexOf(_filterTerm) > -1 ||
-          row.contactName.toLowerCase().indexOf(_filterTerm) > -1 ||
-          row.address.toLowerCase().indexOf(_filterTerm) > -1
-      )
-      .slice(startIndex, endIndex);
+    _data = filteredData.slice(startIndex, endIndex);
 
     // Display the data in the table
     // displayData(data);
     update();
 
     // Update the page navigation
-    const totalPages = Math.ceil(readOnlyData.length / pageSize);
+    const totalPages = Math.ceil(filteredData.length / pageSize);
     document.getElementById(
       "page-navigation"
     ).innerHTML = `Page ${currentPage} of ${totalPages}`;
@@ -254,6 +244,7 @@ export const createTable = (data, containerId, config) => {
 
     // repopulate table based on the new filter
     update();
+    paginate();
     return;
   };
 
