@@ -62,73 +62,26 @@ export const buildConfig = (data, config) => {
 };
 
 // (data: array, containerId: string, options: obj})
-const createTable = (data, containerId, config) => {
-  const _el = document.getElementById(containerId);
+export const createTable = (data, containerId, config) => {
+  const containerElem = document.getElementById(containerId);
   const readOnlyData = data;
-  let _table = data;
+  let _data = data;
+  let _currentSort = false;
 
-  // if no config object is passed in default to:
-  // sortable = true and baseFmt for all data cells
   const _config = buildConfig(data, config);
 
-  // setup basic table elements needed
   const table = document.createElement("table");
   const thead = document.createElement("thead");
   const tbody = document.createElement("tbody");
+  table.id = "tw-table";
+  tbody.id = "table-body";
+
   const headerRow = document.createElement("tr");
-
-  // create headers from keys in first object
-  const headers = Object.keys(data[0]);
-
-  // create columns for header row
-  convertCamelCaseToTitleCase(headers).forEach((header) => {
-    const th = document.createElement("th");
-    const text = document.createTextNode(header);
-    th.appendChild(text);
-    headerRow.appendChild(th);
-  });
-
-  const update = () => {
-    const table = document.createElement("table");
-    const thead = document.createElement("thead");
-    const tbody = document.createElement("tbody");
-
-    thead.appendChild(headerRow);
-
-    _table.forEach((rowData) => {
-      const tr = document.createElement("tr");
-      tr.setAttribute("data-id", rowData["id"]);
-      tr.setAttribute("onclick", `view('/deal?id=${rowData["id"]}')`);
-      tr.className = "text-xl";
-      headers.forEach((header) => {
-        // get the format function for this column
-        const fn = _config.fmtFn[header];
-        // call the format function and append to table
-        const td = document.createElement("td");
-        const text = fn(rowData[header], rowData);
-        td.innerHTML = text;
-        tr.appendChild(td);
-      });
-      tbody.appendChild(tr);
-    });
-    table.appendChild(thead);
-    table.appendChild(tbody);
-
-    _el.innerHTML = table.outerHTML;
-    return tbody;
-  };
-
-  update();
-
-  //   table.appendChild(thead);
-  table.appendChild(tbody);
-
-  _el.appendChild(table);
-
-  let _currentSort = false;
 
   // sort internal data list then update the html
   const _sortTable = (e) => {
+    const key = e.target.dataset.value;
+
     const sortAsc = (a, b) => {
       if (typeof a === "string" && typeof b === "string") {
         return a.localeCompare(b);
@@ -143,18 +96,77 @@ const createTable = (data, containerId, config) => {
         return b - a;
       }
     };
-    const key = e.target.dataset.value;
 
     if (_currentSort === true) {
-      _table.sort((a, b) => sortAsc(a[key], b[key]));
+      _data.sort((a, b) => sortAsc(a[key], b[key]));
     } else {
-      _table.sort((a, b) => sortDesc(a[key], b[key]));
+      _data.sort((a, b) => sortDesc(a[key], b[key]));
     }
 
     update();
     _currentSort = !_currentSort;
     return;
   };
+
+  const columnNames = Object.keys(data[0]);
+
+  // create columns for header row
+  convertCamelCaseToTitleCase(columnNames).forEach((columnName, i) => {
+    const th = document.createElement("th");
+    const text = document.createTextNode(columnName);
+    th.dataset.value = columnNames[i];
+    th.appendChild(text);
+
+    headerRow.appendChild(th);
+  });
+
+  thead.appendChild(headerRow);
+  table.appendChild(thead);
+
+  const update = () => {
+    console.log("updating...");
+    const tbody = document.getElementById("table-body");
+    const table = document.getElementById("tw-table");
+
+    console.log(table);
+    table.removeChild(tbody);
+
+    tbody.innerHTML = "";
+
+    // for each of the rows in the internal object array
+    _data.forEach((rowData) => {
+      // create a new row element
+      const tr = document.createElement("tr");
+      tr.setAttribute("data-id", rowData["id"]);
+      tr.setAttribute("onclick", `view('/deal?id=${rowData["id"]}')`);
+
+      columnNames.forEach((headerString) => {
+        // get the format function for this column
+        const fn = _config.fmtFn[headerString];
+        const td = document.createElement("td");
+
+        // format the innerHTML for this column
+        const text = fn(rowData[headerString], rowData);
+        td.innerHTML = text;
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    });
+
+    // add the newly created row to the table
+    table.appendChild(tbody);
+
+    containerElem.innerHTML = table.outerHTML;
+    return table;
+  };
+
+  //   update();
+
+  //   table.appendChild(thead);
+  table.appendChild(tbody);
+
+  containerElem.appendChild(table);
+  update();
 
   const _filterTable = (e) => {
     // need to take sorted into consideration to keep
@@ -163,7 +175,7 @@ const createTable = (data, containerId, config) => {
     // and pagination
     const searchTerm = e.target.value.toLowerCase();
 
-    _table = readOnlyData.filter(
+    _data = readOnlyData.filter(
       (row) =>
         row.name.toLowerCase().indexOf(searchTerm) > -1 ||
         row.email.toLowerCase().indexOf(searchTerm) > -1 ||
@@ -177,43 +189,12 @@ const createTable = (data, containerId, config) => {
 
   return {
     // Table API
-    rows: _table,
+    rows: _data,
     search: _filterTable, //
     sort: _sortTable, // sort based on data-value of buttons
-    container: _el, // return the element containing the table
+    container: containerElem, // return the element containing the table
   };
 };
-
-const tableOptions = {
-  sortable: false,
-  cellOverrides: {
-    id: (v, row) => grayCol(v, row),
-    name: (v, row) => grayCol(v, row),
-    contactName: (v, row) => dealNameCol(v, row),
-    amount: (v, row) => amountCol(v, row),
-    email: (v, row) => grayCol(v, row),
-    address: (v, row) => grayCol(v, row),
-  },
-};
-
-const tableData = data;
-// const tableData = generateObjects(100);
-
-console.log(tableData);
-
-const dataTable = createTable(tableData, "Table", tableOptions);
-
-const btn = document.getElementById("sort");
-btn.onclick = dataTable.sort;
-
-const btnName = document.getElementById("sort-name");
-btnName.onclick = dataTable.sort;
-
-const btnId = document.getElementById("sort-id");
-btnId.onclick = dataTable.sort;
-
-const searchBox = document.getElementById("search");
-searchBox.onkeyup = dataTable.search;
 
 // TESTS
 const dataTest = [
