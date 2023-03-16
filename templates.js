@@ -31,6 +31,7 @@ export const dealNameCol = (val, row) => {
 };
 
 export const amountCol = (val, row) => {
+  console.log(val);
   return `
     <td>
         <div class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">

@@ -65,6 +65,7 @@ export const createTable = (data, containerId, config) => {
   table.id = "tw-table";
   table.className = "w-full";
   tbody.id = "table-body";
+  tbody.className = "divide-y divide-gray-200";
   table.appendChild(tbody);
 
   containerElem.appendChild(table);
@@ -105,6 +106,7 @@ export const createTable = (data, containerId, config) => {
   convertCamelCaseToTitleCase(columnNames).forEach((columnName, i) => {
     const th = document.createElement("th");
     const text = document.createTextNode(columnName);
+    th.className = "py-3.5 px-3 text-left text-sm text-gray-700";
 
     // set the data-value of the column to the field names to use to sort on click
     th.dataset.value = columnNames[i];
@@ -121,6 +123,7 @@ export const createTable = (data, containerId, config) => {
     const table = document.getElementById("tw-table");
     table.removeChild(tbody);
     tbody.innerHTML = "";
+    tbody.className = "divide-y divide-gray-200";
 
     // populate the tbody
     _data.forEach((rowData) => {
