@@ -64,9 +64,11 @@ export const buildConfig = (data, config) => {
 // (data: array, containerId: string, options: obj})
 export const createTable = (data, containerId, config) => {
   const containerElem = document.getElementById(containerId);
+  const columnNames = Object.keys(data[0]);
+
   const readOnlyData = data;
   let _data = data;
-  let _currentSort = false;
+  let _sortDirection = false;
 
   const _config = buildConfig(data, config);
 
@@ -75,7 +77,9 @@ export const createTable = (data, containerId, config) => {
   const tbody = document.createElement("tbody");
   table.id = "tw-table";
   tbody.id = "table-body";
+  table.appendChild(tbody);
 
+  containerElem.appendChild(table);
   const headerRow = document.createElement("tr");
 
   // sort internal data list then update the html
@@ -97,45 +101,42 @@ export const createTable = (data, containerId, config) => {
       }
     };
 
-    if (_currentSort === true) {
-      _data.sort((a, b) => sortAsc(a[key], b[key]));
+    if (_sortDirection === true) {
+      _data = readOnlyData.sort((a, b) => sortAsc(a[key], b[key]));
     } else {
-      _data.sort((a, b) => sortDesc(a[key], b[key]));
+      _data = readOnlyData.sort((a, b) => sortDesc(a[key], b[key]));
     }
+    paginate();
 
-    update();
-    _currentSort = !_currentSort;
+    // update();
+    _sortDirection = !_sortDirection;
     return;
   };
 
-  const columnNames = Object.keys(data[0]);
-
-  // create columns for header row
+  // convert data object keys to spaced and capitalized,
+  // then create columns for header row
   convertCamelCaseToTitleCase(columnNames).forEach((columnName, i) => {
     const th = document.createElement("th");
     const text = document.createTextNode(columnName);
+
+    // set the data-value of the column to the field names to use on click
     th.dataset.value = columnNames[i];
     th.appendChild(text);
-
     headerRow.appendChild(th);
   });
 
   thead.appendChild(headerRow);
   table.appendChild(thead);
 
+  // table populate function
   const update = () => {
-    console.log("updating...");
     const tbody = document.getElementById("table-body");
     const table = document.getElementById("tw-table");
-
-    console.log(table);
     table.removeChild(tbody);
-
     tbody.innerHTML = "";
 
-    // for each of the rows in the internal object array
+    // populate the tbody
     _data.forEach((rowData) => {
-      // create a new row element
       const tr = document.createElement("tr");
       tr.setAttribute("data-id", rowData["id"]);
       tr.setAttribute("onclick", `view('/deal?id=${rowData["id"]}')`);
@@ -153,28 +154,73 @@ export const createTable = (data, containerId, config) => {
       tbody.appendChild(tr);
     });
 
-    // add the newly created row to the table
+    // add populated tbody to table
     table.appendChild(tbody);
 
+    // place the table inside the container element
     containerElem.innerHTML = table.outerHTML;
     return table;
   };
 
-  //   update();
+  // Define the page size
+  const pageSize = 10;
 
-  //   table.appendChild(thead);
-  table.appendChild(tbody);
+  // Define the current page
+  let currentPage = 1;
 
-  containerElem.appendChild(table);
+  // filter and sort need to be mainted on pagination
+
+  // Define the function to handle pagination
+  const paginate = () => {
+    // Calculate the start index and end index of the current page
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+
+    // Get the data for the current page
+    _data = readOnlyData.slice(startIndex, endIndex);
+
+    // Display the data in the table
+    // displayData(data);
+    update();
+
+    // Update the page navigation
+    const totalPages = Math.ceil(readOnlyData.length / pageSize);
+    document.getElementById(
+      "page-navigation"
+    ).innerHTML = `Page ${currentPage} of ${totalPages}`;
+
+    // Disable or enable the previous and next buttons as needed
+    if (currentPage === 1) {
+      document.getElementById("previous-button").disabled = true;
+    } else {
+      document.getElementById("previous-button").disabled = false;
+    }
+    if (currentPage === totalPages) {
+      document.getElementById("next-button").disabled = true;
+    } else {
+      document.getElementById("next-button").disabled = false;
+    }
+  };
+
+  // populate table for the first time
   update();
 
+  paginate();
+
+  // Add event listeners to the previous and next buttons
+  document.getElementById("previous-button").addEventListener("click", () => {
+    currentPage--;
+    paginate();
+  });
+  document.getElementById("next-button").addEventListener("click", () => {
+    currentPage++;
+    paginate();
+  });
+
   const _filterTable = (e) => {
-    // need to take sorted into consideration to keep
-    // results sorted when searching
-    // and limit per page
-    // and pagination
     const searchTerm = e.target.value.toLowerCase();
 
+    // filter the results using the master list
     _data = readOnlyData.filter(
       (row) =>
         row.name.toLowerCase().indexOf(searchTerm) > -1 ||
@@ -183,6 +229,7 @@ export const createTable = (data, containerId, config) => {
         row.address.toLowerCase().indexOf(searchTerm) > -1
     );
 
+    // repopulate table based on the new filter
     update();
     return;
   };
