@@ -23,30 +23,19 @@
     </style>
   </head>
   <body>
+    <button id="set-page-size" class="btn bg-violet">set page size 50</button>
+    <select id="page-size-dropdown">
+      <option value="10">10</option>
+      <option value="25">25</option>
+      <option value="50">50</option>
+      <option value="100">100</option>
+    </select>
     <div class="px-4 sm:px-6 lg:px-8">
-      <div class="sm:flex sm:items-center">
-        <div class="sm:flex-auto">
-          <h1 class="text-base font-semibold leading-6 text-gray-900">Users</h1>
-        </div>
-        <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
-          <button
-            type="button"
-            class="block rounded-md bg-indigo-600 py-2 px-3 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-          >
-            Add deal
-          </button>
-        </div>
-      </div>
       <div class="mt-8 flow-root">
         <div class="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
           <div
             class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8"
           >
-            <button class="btn" id="sort-id" data-value="id">id</button>
-            <button class="btn" id="sort-name" data-value="contactName">
-              name
-            </button>
-            <button class="btn" id="sort" data-value="amount">amount</button>
             <input
               id="search"
               name="search"
@@ -83,31 +72,21 @@
         },
       };
 
-      const tableData = data;
-      // const tableData = generateObjects(100);
+      const tableData = data; // or generateObjects(1000);
 
       const dataTable = createTable(tableData, "Table", tableOptions);
 
-      const btn = document.getElementById("sort");
-      btn.onclick = dataTable.sort;
+      const pageSizeButton = document.getElementById("set-page-size");
 
-      const btnName = document.getElementById("sort-name");
-      btnName.onclick = dataTable.sort;
+      const dropdown = document.getElementById("page-size-dropdown");
 
-      const btnId = document.getElementById("sort-id");
-      btnId.onclick = dataTable.sort;
+      dropdown.addEventListener("change", function () {
+        const selectedOption = dropdown.options[dropdown.selectedIndex].value;
+        dataTable.setPageSize(parseInt(selectedOption));
+      });
 
       const searchBox = document.getElementById("search");
       searchBox.onkeyup = dataTable.search;
-
-      const tableHeaders = document.querySelectorAll("th");
-
-      tableHeaders.forEach((th) => {
-        th.addEventListener("click", (e) => {
-          console.log(e);
-          dataTable.sort;
-        });
-      });
     </script>
   </body>
 </html>

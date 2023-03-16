@@ -1,16 +1,3 @@
-// - A table, where each row is a Deal with attributes:
-//      Id, Name, Amount ($), Address, Contact Name
-//
-// - Clicking on a Deal takes you to that Deal's details page
-//
-// - DONE Ascending/Descending sorting for the first 3 columns
-//
-// - Adjustable # of entries per page
-//
-// - Pagination
-//
-// - DONE Search
-
 import { generateObjects } from "./table.js";
 import { data } from "./data.js";
 import { convertCamelCaseToTitleCase } from "./utils.js";
@@ -61,7 +48,7 @@ export const buildConfig = (data, config) => {
   }
 };
 
-// (data: array, containerId: string, options: obj})
+// (data: array of objects, containerId: string id of container elem, options: obj})
 export const createTable = (data, containerId, config) => {
   const containerElem = document.getElementById(containerId);
   const columnNames = Object.keys(data[0]);
@@ -82,10 +69,9 @@ export const createTable = (data, containerId, config) => {
   containerElem.appendChild(table);
   const headerRow = document.createElement("tr");
 
-  // sort internal data list then update the html
+  // sort internal data list then update the DOM
   const _sortTable = (e) => {
     const key = e.target.dataset.value;
-
     const sortAsc = (a, b) => {
       if (typeof a === "string" && typeof b === "string") {
         return a.localeCompare(b);
@@ -119,7 +105,7 @@ export const createTable = (data, containerId, config) => {
     const th = document.createElement("th");
     const text = document.createTextNode(columnName);
 
-    // set the data-value of the column to the field names to use on click
+    // set the data-value of the column to the field names to use to sort on click
     th.dataset.value = columnNames[i];
     th.appendChild(text);
     headerRow.appendChild(th);
@@ -128,7 +114,7 @@ export const createTable = (data, containerId, config) => {
   thead.appendChild(headerRow);
   table.appendChild(thead);
 
-  // table populate function
+  // table populate/redraw function
   const update = () => {
     const tbody = document.getElementById("table-body");
     const table = document.getElementById("tw-table");
@@ -159,11 +145,21 @@ export const createTable = (data, containerId, config) => {
 
     // place the table inside the container element
     containerElem.innerHTML = table.outerHTML;
+
+    const tableHeaders = document.getElementsByTagName("th");
+    for (let el of tableHeaders) {
+      el.addEventListener("click", _sortTable);
+    }
+
     return table;
   };
 
-  // Define the page size
-  const pageSize = 10;
+  // Define the page size and private update size function
+  let _pageSize = 10;
+  const _setPageSize = (n) => {
+    _pageSize = n;
+    paginate();
+  };
 
   // semi-global flag to be used in paginate
   let searchTerm;
@@ -184,20 +180,17 @@ export const createTable = (data, containerId, config) => {
     );
 
     // Calculate the start index and end index of the current page
-    const startIndex = (currentPage - 1) * pageSize;
-    const endIndex = startIndex + pageSize;
-
-    console.log("filter: ", _filterTerm);
+    const startIndex = (currentPage - 1) * _pageSize;
+    const endIndex = startIndex + _pageSize;
 
     // Get the data for the current page
     _data = filteredData.slice(startIndex, endIndex);
 
     // Display the data in the table
-    // displayData(data);
     update();
 
     // Update the page navigation
-    const totalPages = Math.ceil(filteredData.length / pageSize);
+    const totalPages = Math.ceil(filteredData.length / _pageSize);
     document.getElementById(
       "page-navigation"
     ).innerHTML = `Page ${currentPage} of ${totalPages}`;
@@ -218,6 +211,7 @@ export const createTable = (data, containerId, config) => {
   // populate table for the first time
   update();
 
+  // paginate the results if necessary
   paginate();
 
   // Add event listeners to the previous and next buttons
@@ -254,6 +248,7 @@ export const createTable = (data, containerId, config) => {
     search: _filterTable, //
     sort: _sortTable, // sort based on data-value of buttons
     container: containerElem, // return the element containing the table
+    setPageSize: _setPageSize,
   };
 };
 
