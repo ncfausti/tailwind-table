@@ -13,3 +13,8 @@ tr, td {
 button {
     background-color: rgb(80, 0, 162)
 }
+
+#Table {
+    height: 80vh;
+    overflow: scroll;
+}

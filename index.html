@@ -23,13 +23,6 @@
     </style>
   </head>
   <body>
-    <button id="set-page-size" class="btn bg-violet">set page size 50</button>
-    <select id="page-size-dropdown">
-      <option value="10">10</option>
-      <option value="25">25</option>
-      <option value="50">50</option>
-      <option value="100">100</option>
-    </select>
     <div class="px-4 sm:px-6 lg:px-8">
       <div class="mt-8 flow-root">
         <div class="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -43,14 +36,42 @@
               placeholder="Search"
               type="search"
             />
-            <div id="page-navigation"></div>
-            <button id="previous-button">Previous</button>
-            <button id="next-button">Next</button>
-            <div id="Table"></div>
+
+            <nav
+              class="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6"
+              aria-label="Pagination"
+            >
+              <div
+                id="page-navigation"
+                class="border-gray-200 text-sm text-blue bg-white px-4 py-3 sm:px-6"
+                aria-label="Pagination"
+              ></div>
+
+              <div class="flex flex-1 justify-between sm:justify-end">
+                <a
+                  href="#"
+                  class="relative inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:outline-offset-0"
+                  ><button id="previous-button">Previous</button></a
+                >
+                <a
+                  href="#"
+                  class="relative ml-3 inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:outline-offset-0"
+                  ><button id="next-button">Next</button></a
+                >
+                <select id="page-size-dropdown" class="px-3">
+                  <option value="10">10</option>
+                  <option value="25">25</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
+                </select>
+              </div>
+            </nav>
+            <div id="Table" ></div>
           </div>
         </div>
       </div>
     </div>
+
     <script type="module" src="index.js"></script>
     <script type="module" src="data.js"></script>
     <script type="module" src="table.js"></script>

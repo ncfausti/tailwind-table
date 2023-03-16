@@ -63,6 +63,7 @@ export const createTable = (data, containerId, config) => {
   const thead = document.createElement("thead");
   const tbody = document.createElement("tbody");
   table.id = "tw-table";
+  table.className = "w-full";
   tbody.id = "table-body";
   table.appendChild(tbody);
 
@@ -193,7 +194,7 @@ export const createTable = (data, containerId, config) => {
     const totalPages = Math.ceil(filteredData.length / _pageSize);
     document.getElementById(
       "page-navigation"
-    ).innerHTML = `Page ${currentPage} of ${totalPages}`;
+    ).innerHTML = `Showing page ${currentPage} of ${totalPages}`;
 
     // Disable or enable the previous and next buttons as needed
     if (currentPage === 1) {

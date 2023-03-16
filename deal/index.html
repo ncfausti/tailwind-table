@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <title>Document</title>
+    <title>Details View</title>
     <script></script>
   </head>
   <body class="h-full">
@@ -99,32 +99,11 @@
             </div>
 
             <!-- Mobile menu, show/hide based on mobile menu state. -->
-            <div class="sm:hidden">
-              <!--
-              Mobile menu overlay, show/hide based on mobile menu state.
-  
-              Entering: "duration-150 ease-out"
-                From: "opacity-0"
-                To: "opacity-100"
-              Leaving: "duration-150 ease-in"
-                From: "opacity-100"
-                To: "opacity-0"
-            -->
+            <div class="hidden sm:hidden">
               <div
                 class="fixed inset-0 z-20 bg-black bg-opacity-25"
                 aria-hidden="true"
               ></div>
-
-              <!--
-              Mobile menu, show/hide based on mobile menu state.
-  
-              Entering: "duration-150 ease-out"
-                From: "opacity-0 scale-95"
-                To: "opacity-100 scale-100"
-              Leaving: "duration-150 ease-in"
-                From: "opacity-100 scale-100"
-                To: "opacity-0 scale-95"
-            -->
               <div
                 class="absolute top-0 right-0 z-30 w-full max-w-none origin-top transform p-2 transition"
               >
