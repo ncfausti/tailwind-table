@@ -24,4 +24,4 @@ These are indicative guidelines and you should feel free to do more, make assump
 Feel free to ask us any clarifying questions as needed. 
 
 
-[Demo link](https://nickfausti.com/projects/pod-demo)
+[Demo link](https://flourishing-dodol-75a9a7.netlify.app/)

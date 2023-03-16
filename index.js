@@ -8,6 +8,8 @@ const fmtBase = (val) => {
   return val;
 };
 
+const DEMO_URL = "https://nickfausti.com/projects/pod-demo/deal/";
+
 export const buildConfig = (data, config) => {
   if (!data) throw new Error("Must specify a datasource");
   if (data.length === 0)
@@ -129,7 +131,7 @@ export const createTable = (data, containerId, config) => {
     _data.forEach((rowData) => {
       const tr = document.createElement("tr");
       tr.setAttribute("data-id", rowData["id"]);
-      tr.setAttribute("onclick", `view('/deal?id=${rowData["id"]}')`);
+      tr.setAttribute("onclick", `view('${DEMO_URL}?id=${rowData["id"]}')`);
 
       columnNames.forEach((headerString) => {
         // get the format function for this column
